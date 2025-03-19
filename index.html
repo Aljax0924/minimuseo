@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Museo Virtual - Alvaro Mendoza Saab</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .museo-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAwIiBoZWlnaHQ9IjgwMCI+PHJlY3Qgd2lkdGg9IjEwMDAiIGhlaWdodD0iODAwIiBmaWxsPSIjMzAzMDMwIi8+PHBhdGggZD0iTTAgMCBMIDEwMDAgMCBMIDEwMDAgMTUwIEwgMCAxNTAgWiIgZmlsbD0iIzIwMjAyMCIvPjxwYXRoIGQ9Ik0wIDcwMCBMIDEwMDAgNzAwIEwgMTAwMCA4MDAgTCAwIDgwMCBaIiBmaWxsPSIjMmEyYTJhIi8+PHBhdGggZD0iTTAgMCBMIDAgODAwIE0gMTAwIDAgTCAxMDAgODAwIE0gMjAwIDAgTCAyMDAgODAwIE0gMzAwIDAgTCAzMDAgODAwIE0gNDAwIDAgTCA0MDAgODAwIE0gNTAwIDAgTCA1MDAgODAwIE0gNjAwIDAgTCA2MDAgODAwIE0gNzAwIDAgTCA3MDAgODAwIE0gODAwIDAgTCA4MDAgODAwIE0gOTAwIDAgTCA5MDAgODAwIE0gMTAwMCAwIEwgMTAwMCA4MDAiIHN0cm9rZT0iIzI4MjgyOCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTAgMCBMIDEwMDAgMCBNIDAgMTAwIEwgMTAwMCAxMDAgTSAwIDIwMCBMIDEwMDAgMjAwIE0gMCAzMDAgTCAxMDAwIDMwMCBNIDAgNDAwIEwgMTAwMCA0MDAgTSAwIDUwMCBMIDEwMDAgNTAwIE0gMCA2MDAgTCAxMDAwIDYwMCBNIDAgNzAwIEwgMTAwMCA3MDAgTSAwIDgwMCBMIDEwMDAgODAwIiBzdHJva2U9IiMyODI4MjgiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==');
+            background-size: cover;
+        }
+        
+        .lights {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .light {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,204,0.6) 30%, rgba(255,255,150,0) 70%);
+            border-radius: 50%;
+            margin-top: 20px;
+            box-shadow: 0 0 20px 10px rgba(255, 255, 200, 0.4);
+        }
+        
+        .light::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(to bottom, rgba(255,255,200,0.4) 0%, rgba(255,255,200,0) 100%);
+            clip-path: polygon(50% 0%, 20% 100%, 80% 100%);
+            transform: translateX(-35px);
+        }
+        
+        .estante {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 70%;
+            background-color: rgba(20, 20, 20, 0.8);
+            border: 2px solid #444;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            padding: 20px;
+            transition: opacity 0.5s;
+        }
+        
+        .imagen-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .imagen-container::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 30px;
+            bottom: -15px;
+            background-color: #333;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+        
+        .imagen-obra {
+            max-width: 100%;
+            max-height: 80%;
+            object-fit: contain;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            border: 5px solid #444;
+        }
+        
+        .ficha-tecnica {
+            flex: 0 0 420px;
+            margin-left: 20px;
+            padding: 20px;
+            background-color: rgba(50, 50, 50, 0.7);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+        
+        .ficha-tecnica h2 {
+            margin-bottom: 15px;
+            color: #d4af37;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .ficha-tecnica p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .navegacion {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .btn-nav {
+            background-color: rgba(50, 50, 50, 0.7);
+            color: #d4af37;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .btn-nav:hover {
+            background-color: rgba(80, 80, 80, 0.9);
+            transform: scale(1.05);
+        }
+        
+        .flechas {
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            transform: translateY(-50%);
+        }
+        
+        .flecha {
+            background-color: rgba(50, 50, 50, 0.7);
+            color: #d4af37;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .flecha:hover {
+            background-color: rgba(80, 80, 80, 0.9);
+            transform: scale(1.1);
+        }
+        
+        .contador {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(50, 50, 50, 0.7);
+            color: #d4af37;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="museo-container">
+        <div class="lights">
+            <div class="light"></div>
+            <div class="light"></div>
+            <div class="light"></div>
+            <div class="light"></div>
+            <div class="light"></div>
+            <div class="light"></div>
+            <div class="light"></div>
+        </div>
+        
+        <div id="estante-1" class="estante" style="display:flex;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-1.jpg" alt="Obra 1">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Cuadro Bodegón</h2>
+                <p>
+                    <strong>Bebidas</strong><br>
+                    • Botella de vino<br>
+                    • Copa de vino
+                </p>
+                
+                <p>
+                    <strong>Alimentos</strong><br>
+                    • Pan (dos piezas)<br>
+                    • Frutas:<br>
+                    • Fresas<br>
+                    • Uvas<br>
+                    • Cerezas
+                </p>
+                
+                <p>
+                    <strong>Elementos decorativos</strong><br>
+                    • Cesta de mimbre<br>
+                    • Flor blanca (marguerita)<br>
+                    • Vela encendida
+                </p>
+                
+                <p>
+                    <strong>Elementos del entorno</strong><br>
+                    • Fondo oscuro (posiblemente una mesa o superficie similar)
+                </p>
+                <p>Este cuadro fue el primero que tuve cuando empecé a vivir solo.</p>
+            </div>
+        </div>
+        
+        <div id="estante-2" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-2.jpg" alt="Obra 2">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Mata Fitonia</h2>
+                <p>
+                    <strong>Mata</strong><br>
+                    • Tipo: Fitonia<br>
+                    • Hojas: Grandes, verdes con manchas amarillas en el centro<br>
+                    • Tamaño: Mediano<br>
+                    • Estado: Saludable, con algunas hojas secas
+                </p>
+                <p>
+                    <strong>Macetero</strong><br>
+                    • Color: Azul<br>
+                    • Diseño: Con un motivo floral<br>
+                    • Tamaño: Adecuado para la planta
+                </p>
+                <p>
+                    <strong>Colores predominantes</strong><br>
+                    • Verde<br>
+                    • Amarillo<br>
+                    • Azul
+                </p>
+                <p>Esta mata me la dio mi mamá cuando me fui de la casa por primera vez.</p>   
+            </div>
+        </div>
+        
+        <div id="estante-3" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-3.jpg" alt="Obra 3">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Colección de Cervezas/Bebidas</h2>
+                <p>
+                    <strong>Estante superior:</strong><br>
+                    • Latas metálicas<br>
+                    • Colores predominantes: dorado, verde, azul, plateado<br>
+                    • Tamaños variados (estándar y mini)<br>
+                    • Etiquetas con diseños diversos
+                </p>
+                
+                <p>
+                    <strong>Estante inferior:</strong><br>
+                    • Latas metálicas<br>
+                    • Colores variados<br>
+                    • Tamaños estándar y pequeños<br>
+                    • Botellas de vidrio<br>
+                    • Formas y tamaños diversos<br>
+                    • Colores: oscuro y claro<br>
+                    • Etiquetas coloridas con diseños variados
+                </p>
+                
+                <p>
+                    <strong>Detalles adicionales:</strong><br>
+                    • Mueble con estantes de cristal
+                </p>   
+                <p>Esta colección en aumento tiene aproximadamente 20 años, mi hermano mayor me la regaló cuando se fue de casa.</p> 
+            </div>
+        </div>
+        
+        <div id="estante-4" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-4.jpg" alt="Obra 4">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Cuadro Bodegón</h2>
+                <p>
+                    <strong>Estructura</strong><br>
+                    • Marco oscuro<br>
+                    • Fondo con gradiente de colores cálidos (naranja, rojo y amarillo)
+                </p>
+                
+                <p>
+                    <strong>Elementos Principales</strong><br>
+                    • Cuatro jarrones estilizados<br>
+                    • Diseños geométricos y motivos abstractos en los jarrones<br>
+                    • Colores contrastantes (negro, blanco, beige y marrón)<br>
+                    • Elemento vegetal (espigas de trigo) en uno de los jarrones<br>
+                    • Base de madera oscura con detalles tallados
+                </p>
+                
+                <p>
+                    <strong>Detalles Artísticos</strong><br>
+                    • Diseño de rayas verticales en el primer jarrón<br>
+                    • Diseño de líneas onduladas en el segundo jarrón<br>
+                    • Diseño de círculos en el tercer jarrón<br>
+                    • Diseño de rayas horizontales en el cuarto jarrón<br>
+                    • Firma del artista en la esquina inferior derecha
+                </p>
+                <p>
+                    Fue el primer cuadro que compré al empezar a vivir con mi pareja.
+                </p>
+            </div>
+        </div>
+        
+        <div id="estante-5" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-5.jpg" alt="Obra 5">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Condimentero Organizador Tipo Ruleta</h2>
+                <p>
+                    <strong>Estructura del organizador</strong><br>
+                    • Tipo de organizador: Ruleta giratoria con capacidad para 18 frascos.<br>
+                    • Material: Estructura de plástico negro resistente.<br>
+                    • Diseño: Filas horizontales de 3 frascos.<br>
+                    • Funcionalidad: Permite girar para acceder fácilmente a los frascos frontales y traseros.
+                </p>
+                
+                <p>
+                    <strong>Frascos</strong><br>
+                    • Cantidad: 18 frascos de vidrio transparente.<br>
+                    • Tamaño: Altura uniforme, diámetro ajustado a las ranuras del organizador.<br>
+                    • Tapa: Negro de plástico, hermética.<br>
+                    • Etiquetas: Círculos de pizarra adheridos en la parte frontal.<br>
+                    • Contenido: Variedad de especias en formas de hojas, granos y polvo.
+                </p>
+                <p>Fue la primera compra para el hogar cuando empecé a vivir con mi pareja.</p> 
+            </div>
+        </div>
+        
+        <div id="estante-6" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-6.jpg" alt="Obra 6">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Computador Portatil con Monitor de Mesa</h2>
+                <p>
+                    <strong>Computador portátil (laptop)</strong><br>
+                    • Color: Blanco con detalles rosados en el teclado.<br>
+                    • Tamaño: Tamaño estándar de laptop (aproximadamente 14-15 pulgadas).<br>
+                    • Pantalla: Abierta, mostrando una hoja de cálculo (Excel) con varias columnas y filas de datos.<br>
+                    • Teclado: Integrado, con letras blancas sobre fondo rosado.<br>
+                    • Trackpad: Debajo del teclado.<br>
+                    • Cámara: Pequeña cámara integrada en la parte superior de la pantalla.
+                </p>
+                
+                <p>
+                    <strong>Monitor externo</strong><br>
+                    • Tamaño: Pantalla grande, probablemente de 24-27 pulgadas.<br>
+                    • Soporte: Base de soporte negra.<br>
+                    • Conexión: Conectado al computador portátil mediante un cable.
+                </p>
+                
+                <p>
+                    <strong>Accesorios periféricos</strong><br>
+                    • Ratón: Ratón externo negro con cable, ubicado a la derecha del computador.
+                </p> 
+                <p>
+                    Aunque no es un computador con el mejor rendimiento ni mejor capacidad, es el equipo con el que he sacado adelante gran part de mi trabajo y mis estudios en el SENA.
+                </p>
+            </div>
+        </div>
+        
+        <div id="estante-7" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-7.jpg" alt="Obra 7">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Nevera</h2>
+                <p>
+                    <strong>Características Generales</strong><br>
+                    • Color: Gris oscuro<br>
+                    • Diseño: Moderno, con superficie lisa<br>
+                    • Tamaño: Modelo estándar de uso doméstico
+                </p>
+                
+                <p>
+                    <strong>Características Visibles</strong><br>
+                    • Despachador de agua: Ubicado en la puerta del congelador<br>
+                    • Superficie decorada: Varios imanes y pegatinas de diferentes diseños<br>
+                    • Puerta principal: Gran superficie lisa sin manijas visibles
+                </p>
+                
+                <p>
+                    <strong>Aspectos Decorativos</strong><br>
+                    • Imanes y pegatinas: Variados diseños y colores.<br>
+                    • Logotipo: Pequeño logotipo en la parte superior central de la nevera
+                </p>
+                <p>Fue el primer electrodoméstico que compré cuando empecé a vivir solo, hace aproximadamente 10 años.</p>
+            </div>
+        </div>
+        
+        <div id="estante-8" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-8.jpg" alt="Obra 8">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Certificado Laboral Latitude</h2>
+                <p>
+                    Empresa: Latitude Corp SAS<br>
+                    Departamento: Gerencia de Talento Humano<br>
+                    Tipo de Documento: Certificado Laboral
+                </p>
+                
+                <p>
+                    <strong>Datos del Empleado</strong><br>
+                    • Nombre: ALVARO JAVIER MENDOZA SAAB<br>
+                    • Número de Identificación: 1.022.968.942<br>
+                    • Tipo de Identificación: Cédula de Ciudadanía (Bogotá)
+                </p>
+                
+                <p>
+                    <strong>Información Laboral</strong><br>
+                    • Fecha de Inicio: 02 de noviembre de 2021<br>
+                    • Fecha de Finalización: 30 de marzo de 2022<br>
+                    • Puesto Desempeñado: Analista Soporte TI<br>
+                    • Tipo de Contrato: Término Indefinido
+                </p>
+                
+                <p>
+                    <strong>Datos de la Empresa</strong><br>
+                    • NIT: 900818856-4<br>
+                    • Gerente: MARISOL MONTOYA MARTINEZ<br>
+                    • Cargo del Gerente: Gerente Administrativa y Talento Humano
+                </p>
+                
+                <p>
+                    <strong>Fecha de Emisión del Certificado</strong><br>
+                    • Fecha: Agosto, 26 de 2022
+                </p>    
+            </div>
+        </div>
+        
+        <div id="estante-9" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-9.jpg" alt="Obra 9">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Acta Individual de Grado 11°</h2>
+               
+                <p>
+                    <strong>Institución Educativa: COLEGIO MIGUEL DE CERVANTES SAAVEDRA</strong><br>
+                    • Dirección: Diagonal 50 Sur No. 44 - 20 Este<br>
+                    • Teléfono: 2 00 10 04<br>
+                    • Fecha de graduación: 07 de Diciembre de 2009<br>
+                    • Lugar: Bogotá D.C.<br>
+                    • Nivel educativo: Bachiller Académico
+                </p>
+                
+                <p>
+                    <strong>Datos del Graduado</strong><br>
+                    • Nombre completo: Mendoza Saab Álvaro Javier<br>
+                    • Número de identificación: C.C. 1,022,968,942
+                </p>
+                
+                <p>
+                    <strong>Referencia del Acta</strong><br>
+                    • Número de acta original: 017<br>
+                    • Folio: 022<br>
+                    • Libro: 03<br>
+                    • Total de graduados en el acta: 131
+                </p>
+                
+                <p>
+                    <strong>Firmantes</strong><br>
+                    • Rector: Lic. VICTOR ZENON CARO CUERVO<br>
+                    • Secretaria: MARIA YANETH BELTRAN ROJAS
+                </p>
+                
+                <p>
+                    <strong>Nota Legal</strong><br>
+                    • "No requiere sellos según decreto 2150 de Diciembre de 1995"
+                </p>
+            </div>
+        </div>
+        
+        <div id="estante-10" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-10.jpg" alt="Obra 10">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Certificado Laboral #2 Geelbe</h2>
+                <p>
+                    <strong>Información de la empresa:</strong><br>
+                    • Nombre: GEELBE COLOMBIA S.A.S<br>
+                    • NIT: 900.343.822-4<br>
+                    • Ubicación: Carrera 21 No 164-74 Bogotá Colombia<br>
+                    • Teléfono: 4864915 ext 1810 - 1820<br>
+                    • Sitio web: www.geebe.com
+                </p>
+                
+                <p>
+                    <strong>Información del empleado:</strong><br>
+                    • Nombre: Álvaro Javier Mendoza Saab<br>
+                    • Identificación: Cédula de Ciudadanía No. 1.022.968.942<br>
+                    • Período de trabajo: 01 Noviembre del 2015 al 30 de Octubre del 2018<br>
+                    • Cargo: Asistente de Operaciones<br>
+                    • Salario mensual: $1'040.000 pesos
+                </p>
+                
+                <p>
+                    <strong>Detalles del certificado:</strong><br>
+                    • Tipo de documento: Certificación laboral<br>
+                    • Fecha de emisión: 30 de Octubre de 2018<br>
+                    • Lugar de emisión: Bogotá<br>
+                    • Firma responsable: Liliana Raveio Barreto, Jefe de Recursos Humanos
+                </p>    
+            </div>
+        </div>
+        
+        <div id="estante-11" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-11.jpg" alt="Obra 11">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Certificado Laboral Kibernum (Banco Falabella)</h2>
+                <p>
+                    <strong>Empresa: KIBERNUM SAS</strong><br>
+                    • NIT de la empresa: 900.709.421-7
+                </p>
+                
+                <p>
+                    <strong>Persona certificada: Alvaro Javier Mendoza Saab</strong><br>
+                    • Documento de identidad: Cédula de Ciudadanía No. 1.022.968.942
+                </p>
+                
+                <p>
+                    <strong>Periodo laboral:</strong><br>
+                    • Del 12 de julio de 2021 al 03 de noviembre de 2021
+                </p>
+                
+                <p>
+                    <strong>Cargo desempeñado:</strong><br>
+                    • Analista de Soporte Técnico
+                </p>
+                
+                <p>
+                    <strong>Tipo de contrato:</strong><br>
+                    • Obra labor
+                </p>
+                
+                <p>
+                    <strong>Fecha de emisión del certificado:</strong><br>
+                    • 04 de noviembre de 2021
+                </p>
+                
+                <p>
+                    <strong>Lugar de emisión:</strong><br>
+                    • Bogotá
+                </p>
+                
+                <p>
+                    <strong>Emisor del certificado:</strong><br>
+                    • Gina Paola Escudero, HT & Hiring Leader de KIBERNUM SAS
+                </p>    
+            </div>
+        </div>
+        
+        <div id="estante-12" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-12.jpg" alt="Obra 12">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Certificado de EPS</h2>
+                <p>
+                    <strong>Información del asegurado:</strong><br>
+                    • Nombre: ALVARO JAVIER MENDOZA SAAB<br>
+                    • Identificación: CC 1022968942<br>
+                    • Condición: Afiliado como 1° COTIZANTE
+                </p>
+                
+                <p>
+                    <strong>Detalles de la afiliación:</strong><br>
+                    • Fecha de Activación: 01/04/2020<br>
+                    • Estado de la Afiliación: RETIRADO<br>
+                    • IPS: COLSUBSIDIO CENTRO MEDICO USAQUEN<br>
+                    • Categoría: A
+                </p>
+                
+                <p>
+                    <strong>Fecha de expedición:</strong><br>
+                    • Solicitud realizada por el interesado el 10 de noviembre de 2022
+                </p>
+                
+                <p>
+                    <strong>Validez de la certificación:</strong><br>
+                    • Vigencia de un mes desde la fecha de generación
+                </p>
+                
+                <p>
+                    <strong>Observaciones:</strong><br>
+                    • NO VÁLIDO PARA TRASLADO A OTRA EPS.
+                </p>
+                
+                <p>
+                    <strong>Firma y cargo del emisor:</strong><br>
+                    • Fredy Alexander Caicedo Sierra<br>
+                    • Director Operaciones Comerciales<br>
+                    • EPS FAMISANAR S.A.S.
+                </p>    
+            </div>
+        </div>
+        
+        <div id="estante-13" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-13.jpg" alt="Obra 13">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Certificado de Cesantias</h2>
+                <p>
+                    <strong>Tipo de documento: Constancia de afiliación a fondo de cesantías</strong><br>
+                    • Entidad emisora: Protección - Fondo de Cesantías Protección<br>
+                    • NIT de la entidad: 800.170.494<br>
+                    • Nombre del afiliado: ALVARO JAVIER MENDOZA SAAB<br>
+                    • Número de identificación del afiliado: 1.022.968.942<br>
+                    • Fecha de afiliación: 11 de febrero de 2022<br>
+                    • Fecha de expedición de la constancia: 10 de noviembre de 2022<br>
+                    • Nombre de quien firma: Laura Patricia Merchan Metaute<br>
+                    • Cargo de quien firma: Equipo Gestión de Operaciones<br>
+                    • Medio de verificación: Línea de servicio Protección (Bogotá: 744 44 64 - Medellín y Cali 510 90 99 - Barranquilla: 319 79 99 - Cartagena: 642 49 99 - Nacional 01 8000 52 8000) y página web www.proteccion.com
+                </p>
+                <p>
+                    <strong>Tipo de documento: Constancia de afiliación</strong><br>
+                    • Entidad financiera: Protección<br>
+                    • Número de identificación del titular: 1.022.968.942<br>
+                    • Nombre del titular: ALVARO JAVIER MENDOZA SAAB<br>
+                    • Fecha de afiliación: 2022-02-11<br>
+                    • Fecha de emisión del documento: 2022-11-10<br>
+                    • NIT de la entidad: 800.170.494<br>
+                    • Firmante: Laura Patricia Merchan Metaute<br>
+                    • Cargo del firmante: Equipo Gestión de Operaciones<br>
+                    • Medios de verificación: Teléfonos y página web de Protección
+                </p>    
+            </div>
+        </div>
+        
+        <div id="estante-14" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-14.jpg" alt="Obra 14">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Certificado Laboral</h2>
+                <p>
+                    <strong>Empresa emisora: Alpina</strong><br>
+                    • Persona certificada: ALVARO JAVIER MENDOZA SAAB
+                </p>
+                
+                <p>
+                    <strong>Datos de identificación:</strong><br>
+                    • Tipo de documento: Cédula de ciudadanía<br>
+                    • Número de documento: 1.022.968.942<br>
+                    • Lugar de expedición del documento: Bogotá DC
+                </p>
+                
+                <p>
+                    <strong>Periodo certificado:</strong><br>
+                    • Del 1 de octubre de 2012 al 31 de marzo de 2013
+                </p>
+                
+                <p>
+                    <strong>Tipo de contrato:</strong><br>
+                    • Contrato de aprendizaje
+                </p>
+                
+                <p>
+                    <strong>Fecha de emisión del certificado:</strong><br>
+                    • 18 de marzo de 2014
+                </p>
+                
+                <p>
+                    <strong>Lugar de emisión:</strong><br>
+                    • Bogotá DC
+                </p>
+                
+                <p>
+                    <strong>Emisor del certificado:</strong><br>
+                    • Nombre: Gilberto Rodrigo Sanabria Moreno<br>
+                    • Cargo: Coordinador Nómina<br>
+                    • Número consecutivo del documento: 255882
+                </p>
+                
+                <p>
+                    <strong>Información adicional relevante:</strong><br>
+                    • El documento incluye el membrete de Alpina con sus datos de contacto en la parte inferior<br>
+                    • El certificado está firmado por Gilberto Rodrigo Sanabria Moreno<br>
+                    • El certificado se expide a solicitud del interesado
+                </p>    
+            </div>
+        </div>
+        
+        <div id="estante-15" class="estante" style="display:none;">
+            <div class="imagen-container">
+                <img class="imagen-obra" src="obra-15.jpg" alt="Obra 15">
+            </div>
+            <div class="ficha-tecnica">
+                <h2>Diploma de Grado Pre Kinder</h2>
+                <p>
+                    <strong>República de Colombia</strong><br>
+                    <strong>Colegio La Casita de Alejandra</strong><br>
+                    <strong>Diploma de Honor</strong>
+                </p>
+                
+                <p>
+                    Concedido a: Alvaro Javier Mendoza Saab
+                </p>
+                
+                <p>
+                    Por haber cursado y aprobado satisfactoriamente los estudios correspondientes al nivel Pre-Kinder de Educación Pre-escolar.
+                </p>
+                
+                <p>
+                    <strong>Firmas:</strong><br>
+                    • Director<br>
+                    • Secretario
+                </p>
+                
+                <p>
+                    <strong>Lugar y fecha:</strong><br>
+                    • Bogotá, 25 de noviembre de 1.995
+                </p>
+            </div>
+        </div>
+        
+        <div class="flechas">
+            <button class="flecha" id="prev">&#10094;</button>
+            <button class="flecha" id="next">&#10095;</button>
+        </div>
+        
+        <div class="contador" id="contador">1 / 15</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const estantes = document.querySelectorAll('.estante');
+            const prevBtn = document.getElementById('prev');
+            const nextBtn = document.getElementById('next');
+            const contador = document.getElementById('contador');
+            let currentEstante = 0;
+            
+            // Función para mostrar el estante actual
+            function showEstante(index) {
+                estantes.forEach((estante, i) => {
+                    if (i === index) {
+                        estante.style.display = 'flex';
+                    } else {
+                        estante.style.display = 'none';
+                    }
+                });
+                contador.textContent = `${index + 1} / ${estantes.length}`;
+            }
+            
+            // Botón anterior
+            prevBtn.addEventListener('click', function() {
+                currentEstante = (currentEstante - 1 + estantes.length) % estantes.length;
+                showEstante(currentEstante);
+            });
+            
+            // Botón siguiente
+            nextBtn.addEventListener('click', function() {
+                currentEstante = (currentEstante + 1) % estantes.length;
+                showEstante(currentEstante);
+            });
+            
+            // También permitir navegación con teclado
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') {
+                    prevBtn.click();
+                } else if (e.key === 'ArrowRight') {
+                    nextBtn.click();
+                }
+            });
+            
+            // Mostrar el primer estante al cargar
+            showEstante(currentEstante);
+            
+            // Añadir efecto de luces
+            const lights = document.querySelectorAll('.light');
+            lights.forEach((light, index) => {
+                const delay = index * 500;
+                setInterval(() => {
+                    light.style.opacity = '0.8';
+                    setTimeout(() => {
+                        light.style.opacity = '1';
+                    }, 200);
+                }, 3000 + delay);
+            });
+        });
+    </script>
+</body>
+</html>
